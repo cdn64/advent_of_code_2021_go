@@ -27,30 +27,32 @@ func main() {
 	fmt.Printf("Answer: %d\n", oxygen_generator_rating*co2_scrubber_rating)
 }
 
-func find_rating(numbers []string, filter_fn func([]string, int) byte) string {
-	rating_str := ""
-	filtering_numbers := append([]string(nil), numbers...)
-	for index := 0; index < len(numbers); index++ {
-		filter_value := filter_fn(filtering_numbers, index)
-		filtered_numbers := []string{}
-		for _, number := range filtering_numbers {
-			if number[index] == filter_value {
-				filtered_numbers = append(filtered_numbers, number)
+func find_rating(numbers []string, filter_fn func([]string, string, int) string) string {
+	filter_path := ""
+	matching_number := ""
+	for index := 0; index < len(numbers[0]); index++ {
+		filter_path += filter_fn(numbers, filter_path, index)
+		count := 0
+		for _, number := range numbers {
+			if number[0:(index+1)] == filter_path {
+				count += 1
+				matching_number = number
 			}
 		}
-		if len(filtered_numbers) == 1 {
-			rating_str = filtered_numbers[0]
-			break
+		if count == 1 {
+			return matching_number
 		}
-		filtering_numbers = filtered_numbers
 	}
-	return rating_str
+	return ""
 }
 
-func count_values(numbers []string, index int) (int, int) {
+func count_values(numbers []string, filter_path string, index int) (int, int) {
 	zeroes := 0
 	ones := 0
 	for _, number := range numbers {
+		if number[0:(index)] != filter_path {
+			continue
+		}
 		if number[index] == '1' {
 			ones += 1
 		} else {
@@ -60,24 +62,24 @@ func count_values(numbers []string, index int) (int, int) {
 	return zeroes, ones
 }
 
-func most_common_value(numbers []string, index int) byte {
-	zeroes, ones := count_values(numbers, index)
+func most_common_value(numbers []string, filter_path string, index int) string {
+	zeroes, ones := count_values(numbers, filter_path, index)
 	if zeroes > ones {
-		return '0'
+		return "0"
 	}
 	if ones > zeroes {
-		return '1'
+		return "1"
 	}
-	return '1'
+	return "1"
 }
 
-func least_common_value(numbers []string, index int) byte {
-	zeroes, ones := count_values(numbers, index)
+func least_common_value(numbers []string, filter_path string, index int) string {
+	zeroes, ones := count_values(numbers, filter_path, index)
 	if zeroes > ones {
-		return '1'
+		return "1"
 	}
 	if ones > zeroes {
-		return '0'
+		return "0"
 	}
-	return '0'
+	return "0"
 }
